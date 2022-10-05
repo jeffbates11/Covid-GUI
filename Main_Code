@@ -1,0 +1,157 @@
+from tkinter import *
+    
+allRecords = []
+activeRecord = 0
+
+#Make window
+window = Tk()
+window.geometry('600x1000')
+window.title("COVID VACCINATION INFORMATION")
+
+screenLable = Label(window, text="Confidential Information", font=50)
+screenLable.place(x=150,y=50)
+
+#File Name Lable
+fileNameLable = Label(window, text="File Name: ")
+fileNameLable.place(x=85,y=100)
+
+#File box
+fileField = StringVar()
+fileEntry = Entry(window, textvariable=fileField)
+fileEntry.configure(width=40)
+fileEntry.place(x=150,y=103)
+
+#Previous Button
+buttonPressedLabelContents = StringVar()
+buttonPressedLabelContents.set('')
+    
+buttonPressedLabel = Label(window, textvariable=buttonPressedLabelContents)
+buttonPressedLabel.place(x=200,y=300)
+
+#Patient Name Label
+patientNameLable = Label(window, text="")
+patientNameLable.place(x=85,y=200)
+
+#Patient Phone Number Label
+patientPhoneNumberLable = Label(window, text='')
+patientPhoneNumberLable.place(x=85,y=235)
+
+#Patient Email Label
+patientEmail = Label(window, text='')
+patientEmail.place(x=85,y=270)
+
+#Vaccine Administered label
+vaccineAdminLabel = Label(window, text='')
+vaccineAdminLabel.place(x=85,y=305)
+
+#symptomsLabel
+symptomsLabel= Label(window, text='')
+symptomsLabel.place(x=85,y=340)
+
+pagesLabel1 = Label(window, text='')
+pagesLabel1.place(x=300,y=200)
+
+pagesLabel2 = Label(window, text='')
+pagesLabel2.place(x=300,y=235)
+
+pagesLabel3 = Label(window, text='')
+pagesLabel3.place(x=300,y=270)
+
+pagesLabel4 = Label(window, text='')
+pagesLabel4.place(x=300,y=305)
+
+pagesLabel5 = Label(window, text='')
+pagesLabel5.place(x=300,y=340)
+
+#submit button function
+def submitPressed():
+    global activeRecord
+    fileName = fileField.get()
+    info = readFile(fileName)
+    previousButton['state'] = DISABLED
+    fileField.set('')
+    
+    #print labels
+    patientNameLable.config(text = 'Patient Name: ')
+    patientPhoneNumberLable.config(text = 'Patient Phone Number: ')
+    patientEmail.config(text = 'Patient E-mail address: ')
+    vaccineAdminLabel.config(text = 'Vaccine Administered: ')
+    symptomsLabel.config(text = 'Symptoms Reported: ')
+    
+    #create list of lists
+    indivdiualRecords = []  
+    for i in range(0,len(info)):
+        info[i] = info[i].strip('\n')
+        #format phone number
+        if info[i].isdigit():
+            info[i] = '(' + str(info[i][0]) + str(info[i][1]) + str(info[i][2]) + ') ' + str(info[i][3]) + str(info[i][4]) + str(info[i][5]) + '-' + str(info[i][6]) + str(info[i][7]) + str(info[i][8]) + str(info[i][9])
+        indivdiualRecords.append(info[i])
+        if len(indivdiualRecords) == 5:
+            allRecords.append(indivdiualRecords)
+            total = 0
+            indivdiualRecords = []
+            
+    #place first labels         
+    pagesLabel1.config(text = allRecords[0][0])
+    pagesLabel2.config(text = allRecords[0][1])
+    pagesLabel3.config(text = allRecords[0][2])
+    pagesLabel4.config(text = allRecords[0][3])
+    pagesLabel5.config(text = allRecords[0][4])
+   
+#next button functions
+def nextPressed():
+    global activeRecord
+    previousButton['state'] = NORMAL
+    activeRecord = activeRecord + 1
+    if activeRecord < len(allRecords):
+        nextButton['state'] = NORMAL    
+    if activeRecord == len(allRecords)-1:
+        nextButton['state'] = DISABLED
+        
+    #update lables
+    pagesLabel1.config(text = allRecords[activeRecord][0])
+    pagesLabel2.config(text = allRecords[activeRecord][1])
+    pagesLabel3.config(text = allRecords[activeRecord][2])
+    pagesLabel4.config(text = allRecords[activeRecord][3])
+    pagesLabel5.config(text = allRecords[activeRecord][4])
+    
+#previous button function 
+def previousPressed():
+    global activeRecord
+    nextButton['state'] = NORMAL
+    activeRecord = activeRecord - 1
+    if activeRecord == 0:
+        previousButton['state'] = DISABLED
+    else:
+        previousButton['state'] = NORMAL
+        
+    #update labels 
+    pagesLabel1.config(text = allRecords[activeRecord][0])
+    pagesLabel2.config(text = allRecords[activeRecord][1])
+    pagesLabel3.config(text = allRecords[activeRecord][2])
+    pagesLabel4.config(text = allRecords[activeRecord][3])
+    pagesLabel5.config(text = allRecords[activeRecord][4])    
+    
+  
+     
+#Submit button
+submitButton = Button(window, text="Submit", width=15, bg="black", fg="white", command=submitPressed)
+submitButton.place(x=200,y=150)
+
+#Next button
+nextButton = Button(window, text="Next", width=15, bg="black", fg="white", command=nextPressed)
+nextButton.place(x=350,y=400)
+
+#Previous button 
+previousButton = Button(window, text="Previous", width=15, bg="black", fg="white", command=previousPressed)
+previousButton.place(x=50,y=400)
+
+
+#Open file function 
+def readFile(fileName):
+    outputFile = open(fileName,'r')
+    data = outputFile.readlines()
+    outputFile.close()
+    return data
+    
+window.mainloop()
